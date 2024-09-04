@@ -13,4 +13,4 @@ npm install
 After installing the dependencies, you can start using the API in your project. Make sure to review the code and customize any settings according to your needs.
 
 ## Author
-This project was created by Aleksandr Yurov for buynstars.com.
+This project was created by Aleksandr Yurov for https://buynstars.com.
