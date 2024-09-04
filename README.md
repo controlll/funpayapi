@@ -7,8 +7,14 @@ This is a Node.js API project designed to interact with the Funpay.com website. 
 To install the necessary dependencies, run the following command:
 
 ```bash
+
 npm install
+check app.js
+
 ```
+
+
+
 ## Usage
 After installing the dependencies, you can start using the API in your project. Make sure to review the code and customize any settings according to your needs.
 
