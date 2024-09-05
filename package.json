@@ -1,5 +1,18 @@
 {
   "type": "module",
+  "name": "funpayapi",
+  "version": "1.0.0",
+  "main": "funpayapi.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/controlll/funpayapi.git"
+  },
+  "author": {
+    "name": "Aleksandr Iurov",
+    "email": "a@iurov.ru",
+    "url": "https://buynstars.com"
+  },
+  "homepage": "https://buynstars.com",
   "dependencies": {
     "canvas": "^2.11.2",
     "form-data": "^4.0.0",
