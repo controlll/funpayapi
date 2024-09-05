@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "funpay-js-api",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "funpayapi.js",
   "types": "index.d.ts",
   "repository": {
