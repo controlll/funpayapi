@@ -94,7 +94,6 @@ class runner extends EventEmitter {
         try{
             let res = await Api.post('runner/', data);
             await this.parser(JSON.parse(res));
-            console.log('updated');
         }catch(e){
             if(data.request)
                 this.requests.unshift(data.request);

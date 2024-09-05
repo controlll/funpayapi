@@ -12,11 +12,10 @@ class api {
     }
     async setConfig(key){
         this.key = key;
-        this.init();
+        await this.init();
     }
     async init(){
         await this.getData();
-        console.log('api loaded', this.data);
         Runner.init();
         this.loaded = true;
     }
@@ -114,7 +113,6 @@ class api {
         const { window } = new JSDOM(offerPage);
         const $ = jQuery(window);
         price = Math.ceil(price * 1000) / 1000;
-        console.log(price,' == ',$('.form-offer-editor [name=price]').val())
         if(price == $('.form-offer-editor [name=price]').val())
             return;
         if(!price)
@@ -166,7 +164,6 @@ class api {
         $('.contact-item').each(function(index){
             const dialogId = $(this).attr('data-id');
             const userName = $('.media-user-name', this).text();
-            //console.log(userName);
             const last_message = $(this).attr('data-node-msg');
             const first_message = $(this).attr('data-user-msg');
             const unread = $(this).hasClass('unread');
