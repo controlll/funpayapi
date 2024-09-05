@@ -13,7 +13,7 @@ npm i funpay-js-api
 #### Example Usage
 
 ```javascript
-import { Api, Runner, Chat } from "./funpay_api/api.js";
+import { Api, Runner, Chat } from "funpay-js-api";
 const goldenkey = 'YOUR GOLDEN KEY FROM COOKIES';
 class app {
     constructor(){
