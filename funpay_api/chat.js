@@ -11,9 +11,15 @@ class chat extends EventEmitter {
     async init(){
         if(this.lastMessage == 0)
             this.lastMessage = await Api.getUserLastMessage(this.id);
+        console.log('loaded chat, last message',this.lastMessage);
         this.handlerId = await Runner.attachChat(this.id, (message)=>{
-            if(message.author == parseInt(this.id))
+            if(message.author == parseInt(this.id)){
+                if(message.id < this.lastMessage){
+                    //console.log('trash message', message.id, this.lastMessage);
+                    return;
+                }
                 this.emit('message', message);
+            }
         }, this.lastMessage);
         this.loaded = true;
     }

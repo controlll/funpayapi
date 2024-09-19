@@ -12,10 +12,11 @@ class api {
     }
     async setConfig(key){
         this.key = key;
-        await this.init();
+        this.init();
     }
     async init(){
         await this.getData();
+        console.log('api loaded', this.data);
         Runner.init();
         this.loaded = true;
     }
@@ -113,6 +114,7 @@ class api {
         const { window } = new JSDOM(offerPage);
         const $ = jQuery(window);
         price = Math.ceil(price * 1000) / 1000;
+        console.log(price,' == ',$('.form-offer-editor [name=price]').val())
         if(price == $('.form-offer-editor [name=price]').val())
             return;
         if(!price)
@@ -164,6 +166,7 @@ class api {
         $('.contact-item').each(function(index){
             const dialogId = $(this).attr('data-id');
             const userName = $('.media-user-name', this).text();
+            //console.log(userName);
             const last_message = $(this).attr('data-node-msg');
             const first_message = $(this).attr('data-user-msg');
             const unread = $(this).hasClass('unread');
@@ -171,6 +174,39 @@ class api {
             dialogs.push({dialogId, last_message, first_message, unread, userName});
         });
         return dialogs;
+    }
+    async getChatNodeByOrderId(order_id){
+        await this.ready();
+        let body = await this.get(`orders/${order_id}/`);
+        const { window } = new JSDOM(body);
+        const $ = jQuery(window);
+        return $('.chat').attr('data-id');
+    }
+    async getLastOrders(){
+        await this.ready();
+        let body = await this.get('orders/trade');
+        const { window } = new JSDOM(body);
+        const $ = jQuery(window);
+        let orders = [];
+        $('.tc-item').each(function(index){
+            const orderId = $('.tc-order', this).text().replace('#','');
+            const url = $('.media-user-name .pseudo-a', this).attr('data-href');
+            const userId = url.split('/').filter(part => part).pop();
+            const date = $('.tc-date-time', this).text();
+            const status = $('.tc-status', this).text();
+            let _product = $('.order-desc div:first-child', this).text().split(', ');
+            let amount = 1;
+            let product = $('.order-desc div:first-child', this).text();
+            if(_product.length > 1){
+                if(_product.at(-1).split(' ').at(-1) == 'шт.'){
+                    amount = Number(_product.at(-1).split(' ')[0]);
+                    product = _product.splice(0, _product.length-1).join(',');
+                }
+            }
+            
+            orders.push({orderId, url, userId, date, status, product, amount});
+        });
+        return orders;
     }
     async getNewOrders(){
         await this.ready();
@@ -264,6 +300,8 @@ class api {
         })
     };
     async uploadFileFromBuffer(imageBuffer, contentType){
+        //const form = new FormData();
+        //form.append('file', fs.createReadStream('path/to/your/file.jpg'));
         const form = new FormData();
         
         form.append('file', imageBuffer, {
@@ -294,12 +332,14 @@ class api {
         return text;
     }
     async uploadFileFromUrl(src){
+        //const form = new FormData();
+        //form.append('file', fs.createReadStream('path/to/your/file.jpg'));
         const form = new FormData();
         let imageBuffer;
         let contentType;
         src = decodeURIComponent(src);
         if (src.startsWith('data:')) {
-            const base64Data = src.split(',')[1];
+            const base64Data = src.split(',')[1]; // Убираем префикс "data:image/jpeg;base64,"
             contentType = src.substring(src.indexOf(':') + 1, src.indexOf(';'));
             if('image/svg+xml' === contentType){
                 try{

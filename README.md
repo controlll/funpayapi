@@ -78,6 +78,9 @@ The Api class provides methods for interacting with the Funpay API.
 - `getDialogs(): Promise<any[]>`
     - Retrieve a list of dialogs for the current user.
 
+- `getLastOrders(): Promise<any[]>`
+    - Retrieve last 100 orders for the current user.
+
 - `getNewOrders(): Promise<any[]>`
     - Retrieve new orders for the current user.
 

@@ -31,7 +31,8 @@ class runner extends EventEmitter {
             return false;
         let lastDate;
         let lastUsername;
-        this.handlers[handlerId] = (data)=>{
+        this.handlers[handlerId] = {callback:null, chatid:chatid};
+        this.handlers[handlerId].callback = (data)=>{
             if(data.node.name == chatid){
                 for(let message of data.messages){
                     const { window } = new JSDOM(message.html.replace(/\n/g, '').replace(/\s{2,}/g, ' '));
@@ -47,21 +48,37 @@ class runner extends EventEmitter {
                 }
             }
         }
-       
-        this.objects.push({"type":"chat_node","id":chatid,"data":{
-            "node":chatid,"last_message":parseInt(last_message),"content":""
-        }});
-        this.on('chat_node', this.handlers[handlerId]);
+        if(!this._checkChatInObjects(chatid)){
+            this.objects.push({"type":"chat_node","id":chatid,"data":{
+                "node":chatid,"last_message":parseInt(last_message),"content":""
+            }});
+        }
+        this.on('chat_node', this.handlers[handlerId].callback);
         await this.update();
         return handlerId;
+    }
+    _checkChatInObjects(chatid){
+        for(let obj of this.objects){
+            if(obj.type == 'chat_node' && obj.id == chatid)
+                return true;
+        }
+        return false;
+    }
+    _getHandlerByChatId(chatid){
+        for(let handler of Object.values(this.handlers)){
+            if(handler.chatid == chatid)
+                return handler;
+        }
+        return false;
     }
     async removeChat(handlerId, id){
         let chatid = getUsersId(Api.data.userId, id);
         for(let i = 0; i < this.objects.length; i++){
             if(this.objects[i].type == "chat_node" && this.objects[i].id == chatid){
-                this.off('chat_node', this.handlers[handlerId]);
+                this.off('chat_node', this.handlers[handlerId].callback);
                 delete this.handlers[handlerId];
-                this.objects.splice(i, 1);
+                if(!this._getHandlerByChatId(chatid))
+                    this.objects.splice(i, 1);
                 return true;
             }
         }

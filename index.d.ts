@@ -10,6 +10,7 @@ declare module "funpay-js-api" {
       getUserLangById(id: number): Promise<string>;
       getUserByDialogId(dialogId: string): Promise<{ userId: number; lang: string }>;
       getDialogs(): Promise<any[]>;
+      getLastOrders(): Promise<any[]>;
       getNewOrders(): Promise<any[]>;
       refund(order_id: number): Promise<any>;
       get(route?: string): Promise<string>;
