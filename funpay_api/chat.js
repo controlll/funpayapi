@@ -1,4 +1,5 @@
 import { Api, Runner } from "./api.js";
+import { timeout } from './utils.js';
 import EventEmitter from 'events';
 class chat extends EventEmitter {
     constructor(id, lastMessage = 0){
@@ -9,8 +10,15 @@ class chat extends EventEmitter {
         this.init();
     }
     async init(){
-        if(this.lastMessage == 0)
-            this.lastMessage = await Api.getUserLastMessage(this.id);
+        if(this.lastMessage == 0){
+            try{
+                this.lastMessage = await Api.getUserLastMessage(this.id);
+            }catch(e){
+                console.error('error getUserLastMessage:', e);
+                await timeout(5000);
+                return await this.init();
+            }
+        }
         console.log('loaded chat, last message',this.lastMessage);
         this.handlerId = await Runner.attachChat(this.id, (message)=>{
             if(message.author == parseInt(this.id)){
