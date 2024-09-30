@@ -95,6 +95,16 @@ class api {
         })
         return lots;
     }
+    async getOfferNewPage(node){
+        const route = `lots/offerEdit?node=${node}`;
+        if(!this.cache[route] || this.cache[route].date < Date.now() - 300000){
+            this.cache[route] = {page:await this.get(route),date:Date.now()};
+        }
+        let offerPage = this.cache[route].page;
+        const { window } = new JSDOM(offerPage);
+        const $ = jQuery(window);
+        return $;
+    }
     async getOfferPage(node, offer){
         if(!this.cache[`lots/offerEdit?node=${node}&offer=${offer}`] || this.cache[`lots/offerEdit?node=${node}&offer=${offer}`].date < Date.now() - 300000){
             console.log('updated cache', `lots/offerEdit?node=${node}&offer=${offer}`);
