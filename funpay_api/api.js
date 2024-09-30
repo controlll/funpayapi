@@ -9,6 +9,7 @@ import { getUsersId } from './utils.js';
 class api {
     constructor(){
         this.loaded = false;
+        this.cache = {};
     }
     async setConfig(key){
         this.key = key;
@@ -34,6 +35,7 @@ class api {
     }
     async getData(){
         let body = await this.get();
+        //console.log(body);
         const { window } = new JSDOM(body);
         const $ = jQuery(window);
         let data = JSON.parse($('body').attr('data-app-data'));
@@ -94,7 +96,11 @@ class api {
         return lots;
     }
     async getOfferPage(node, offer){
-        let offerPage = await this.get(`lots/offerEdit?node=${node}&offer=${offer}`);
+        if(!this.cache[`lots/offerEdit?node=${node}&offer=${offer}`] || this.cache[`lots/offerEdit?node=${node}&offer=${offer}`].date < Date.now() - 300000){
+            console.log('updated cache', `lots/offerEdit?node=${node}&offer=${offer}`);
+            this.cache[`lots/offerEdit?node=${node}&offer=${offer}`] = {page:await this.get(`lots/offerEdit?node=${node}&offer=${offer}`),date:Date.now()};
+        }
+        let offerPage = this.cache[`lots/offerEdit?node=${node}&offer=${offer}`].page;
         const { window } = new JSDOM(offerPage);
         const $ = jQuery(window);
         return $;
@@ -110,7 +116,11 @@ class api {
         return await this.post('lots/offerSave', formDataJSON);
     }
     async updatePrice(node, offer, price){
-        let offerPage = await this.get(`lots/offerEdit?node=${node}&offer=${offer}`);
+        if(!this.cache[`lots/offerEdit?node=${node}&offer=${offer}`] || this.cache[`lots/offerEdit?node=${node}&offer=${offer}`].date < Date.now() - 300000){
+            console.log('updated cache', `lots/offerEdit?node=${node}&offer=${offer}`);
+            this.cache[`lots/offerEdit?node=${node}&offer=${offer}`] = {page:await this.get(`lots/offerEdit?node=${node}&offer=${offer}`),date:Date.now()};
+        }
+        let offerPage = this.cache[`lots/offerEdit?node=${node}&offer=${offer}`].page;
         const { window } = new JSDOM(offerPage);
         const $ = jQuery(window);
         price = Math.ceil(price * 1000) / 1000;
@@ -127,6 +137,8 @@ class api {
             formDataJSON[this.name] = this.value;
         });
         await this.post('lots/offerSave', formDataJSON);
+        delete this.cache[`lots/offerEdit?node=${node}&offer=${offer}`];
+        console.log('updated price', price);
     }
     async getUserLangById(id){
         await this.ready();
@@ -241,7 +253,7 @@ class api {
         const res = await fetch(`https://funpay.com/${route}`, {
             method: "POST",
             headers: {
-                'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 OPR/112.0.0.0',
+                'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
                 'Cookie':`golden_key=${this.key};${this.PHPSESSID?` PHPSESSID=${this.PHPSESSID};`:''}`
             }
         })
@@ -266,14 +278,14 @@ class api {
                 "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
                 "pragma": "no-cache",
                 "priority": "u=1, i",
-                "sec-ch-ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Opera\";v=\"112\"",
+                "sec-ch-ua": "\"Google Chrome\";v=\"129\", \"Not=A?Brand\";v=\"8\", \"Chromium\";v=\"129\"",
                 "sec-ch-ua-mobile": "?0",
                 "sec-ch-ua-platform": "\"Windows\"",
                 "sec-fetch-dest": "empty",
                 "sec-fetch-mode": "cors",
                 "sec-fetch-site": "same-origin",
                 "x-requested-with": "XMLHttpRequest",
-                'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 OPR/112.0.0.0',
+                'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
                 'Cookie':`golden_key=${this.key};${this.PHPSESSID?` PHPSESSID=${this.PHPSESSID};`:''}`
             },
             body: Object.keys(data)
@@ -315,7 +327,7 @@ class api {
                 "cache-control": "no-cache",
                 "pragma": "no-cache",
                 "priority": "u=1, i",
-                "sec-ch-ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Opera\";v=\"112\"",
+                "sec-ch-ua": "\"Google Chrome\";v=\"129\", \"Not=A?Brand\";v=\"8\", \"Chromium\";v=\"129\"",
                 "sec-ch-ua-mobile": "?0",
                 "sec-ch-ua-platform": "\"Windows\"",
                 "sec-fetch-dest": "empty",
